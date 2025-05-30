@@ -1,0 +1,51 @@
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code settings
+.vscode/
+
+# Rider settings
+.idea/
+
+# Logs
+*.log
+
+# NuGet packages
+*.nupkg
+packages/
+
+# Publish outputs
+publish/
+
+# Docker files
+docker-compose.override.yml
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Entity Framework Core Migrations snapshot
+**/Migrations/*.Designer.cs
+
+# JetBrains Rider
+.idea/
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# dotnet watch
+.dotnetwatch/
+
+# Secrets
+secrets.json
+
+# IIS Express
+*.vs/
