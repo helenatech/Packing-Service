@@ -17,20 +17,17 @@ namespace PackingService.API.Services
             var caixasUsadas = new List<PedidoCaixaSaidaDTO>();
             var produtosRestantes = new List<ProdutoEntradaDTO>(pedido.Produtos);
 
-            // Ordena caixas por volume crescente
+            // Ordena caixas da menor para maior
             var caixasOrdenadas = caixasDisponiveis.OrderBy(c => c.Dimensoes.Volume).ToList();
 
             while (produtosRestantes.Any())
             {
                 bool agrupamentoEncontrado = false;
-
-                // Tentar achar grupos maiores (pares, trios...) que caibam juntos numa caixa
-                // Vamos tentar pares e depois individuais
-
-                // Tentativa 1: pares
+                
+                // Encontrar pares que caibam juntos na mesma caixa
                 for (int i = 0; i < produtosRestantes.Count && !agrupamentoEncontrado; i++)
                 {
-                    for (int j = i + 1; j < produtosRestantes.Count && !agrupamentoEncontrado; j++)
+                    for (int j = i + 1; j < produtosRestantes.Count && !agrupamentoEncontrado; j++) //tenta combinar com outro produto, procurando após a posição de i
                     {
                         var grupoTeste = new List<ProdutoEntradaDTO> { produtosRestantes[i], produtosRestantes[j] };
 
@@ -46,15 +43,15 @@ namespace PackingService.API.Services
                             });
 
                             produtosRestantes.Remove(produtosRestantes[i]);
-                            produtosRestantes.Remove(produtosRestantes[j - 1]); // j-1 pois a lista diminui após remover i
-                            agrupamentoEncontrado = true;
+                            produtosRestantes.Remove(produtosRestantes[j - 1]); //serve pra remover o produto j também, descendo uma casinha no índice, já que o i foi removido
+                            agrupamentoEncontrado = true; //interrompe o laço
                         }
                     }
                 }
 
                 if (agrupamentoEncontrado) continue;
 
-                // Tentativa 2: produto individual em caixa que caiba
+                // Pegar o produto individual que sobrou
                 var produto = produtosRestantes[0];
 
                 var caixaIndividual = caixasOrdenadas.FirstOrDefault(c =>
@@ -84,15 +81,15 @@ namespace PackingService.API.Services
             return caixasUsadas;
         }
 
-        // Método auxiliar para testar se um grupo de produtos cabe numa caixa
+        // método auxiliar de produtoCabeNaCaixa
         private bool ProdutoCabemNaCaixa(List<ProdutoEntradaDTO> produtos, Dimensoes caixa)
         {
-            // Soma volumes
+            // soma volumes
             var somaVolumes = produtos.Sum(p => p.Dimensoes.Volume);
 
             if (somaVolumes > caixa.Volume) return false;
 
-            // Verifica se cada produto cabe nas dimensões da caixa (rotação permitida)
+            // Verifica se cada produto cabe nas dimensões da caixa, sendo que podemos rotacionar o produto pra caber
             if (produtos.Any(p => !_produtoEmCaixaService.ProdutoCabeNaCaixa(p.Dimensoes, caixa)))
                 return false;
 
