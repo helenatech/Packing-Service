@@ -51,7 +51,7 @@ docker-compose up --build
 ---
 ## Testes
 
-Para rodar testes unitários (se houver), use:
+Para rodar testes unitários, use:
 
 ```bash
 dotnet test
